@@ -1,0 +1,13 @@
+nick1: 3
+nick1: 4
+nick1: 5
+nick1: 6
+nick1: 7
+Вы вышли из чата.
+/authOk nick3
+nick3: sdvfgsdg
+nick3: dshry
+nick3: jdfyj
+nick3: gszrfgs
+nick3: ytj
+
