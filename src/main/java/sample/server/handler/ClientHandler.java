@@ -6,6 +6,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Level;
 
 public class ClientHandler {
 
@@ -19,6 +22,8 @@ public class ClientHandler {
     public String getNick() {
         return this.nick;
     }
+
+    public static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
 
     public ClientHandler(Server server, Socket socket) {
         try {
@@ -60,13 +65,16 @@ public class ClientHandler {
                     if (!server.isNickBusy(nick)) {
                         sendMsg("/authOk " + nick);
                         this.nick = nick;
+                        LOGGER.log(Level.INFO, this.nick + " join to chat");
                         server.broadcastMsg(this.nick + " join the chat");
                         server.subscribe(this);
                     } else {
+                        LOGGER.log(Level.WARN, this.nick + " already logged in");
                         sendMsg("You are already logged in");
                     }
                     return true;
                 } else {
+                    LOGGER.log(Level.WARN, "Incorrect password or login");
                     sendMsg("Incorrect password or login");
                     return false;
                 }
@@ -77,8 +85,9 @@ public class ClientHandler {
     public void sendMsg(String msg) {
         try {
             dos.writeUTF(msg);
+            LOGGER.log(Level.INFO, getNick() + " sendMsg");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARN, getNick() + "Error 'sendMsg'");
         }
     }
 
@@ -87,6 +96,7 @@ public class ClientHandler {
             String clientStr = dis.readUTF();
             if (clientStr.startsWith("/")) {
                 if (clientStr.equals("/exit")) {
+                    LOGGER.log(Level.INFO, getNick() + " send message '/exit'");
                     return;
                 }
                 if (clientStr.startsWith("/w")) {
@@ -94,33 +104,39 @@ public class ClientHandler {
                     String nickName = strArray[1];
                     String msg = clientStr.substring(4 + nickName.length());
                     server.sendMsgToClient(this, nickName, msg);
+                    LOGGER.log(Level.INFO, getNick() + "send private message");
                 }
                 continue;
             }
             server.broadcastMsg(this.nick + ": " + clientStr);
+            LOGGER.log(Level.INFO, getNick() + " send message to all users");
         }
     }
 
     private void closeConnection() {
         server.unsubscribe(this);
         server.broadcastMsg(this.nick + ": out from chat");
+        LOGGER.log(Level.INFO, this.nick + " out from chat");
 
         try {
             dis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            LOGGER.log(Level.TRACE, e);
         }
 
         try {
             dos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            LOGGER.log(Level.TRACE, e);
         }
 
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            LOGGER.log(Level.TRACE, e);
         }
     }
 }

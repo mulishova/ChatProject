@@ -10,10 +10,16 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
 public class ServerImpl implements Server {
 
     private List<ClientHandler> clients;
     private AuthService authService;
+
+    public static final Logger LOGGER = LogManager.getLogger(ServerImpl.class);
 
     public ServerImpl() {
         try {
@@ -23,12 +29,15 @@ public class ServerImpl implements Server {
             // Цикл подключения клиентов
             while (true) { // Подключение клиентов
                 System.out.println("Ожидаем подключения клиентов");
+                LOGGER.log(Level.INFO, "Ожидаем подключения клиентов");
                 Socket socket = serverSocket.accept(); // Ожидание подключения клиента
                 System.out.println("Клиент подключился");
+                LOGGER.log(Level.INFO, "Клиент подключился");
                 new ClientHandler(this, socket); // Создаем для каждого клиент свой обработчик
             }
         } catch (IOException e) {
             System.out.println("Проблема на сервере");
+            LOGGER.log(Level.ERROR, "Проблема на сервере", e);
         } finally {
             if (authService != null) {
                 authService.stop(); // Сообщение об остановке сервера аутентификации

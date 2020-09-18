@@ -5,9 +5,15 @@ import sample.server.inter.AuthService;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
 public class AuthServiceImpl implements AuthService {
 
     private List<UserEntity> usersList;
+
+    public static final Logger LOGGER = LogManager.getLogger(AuthServiceImpl.class);
 
     public AuthServiceImpl() {
         this.usersList = new LinkedList<>();
@@ -19,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void start() {
+        LOGGER.log(Level.INFO, "Сервис аутентификации запущен");
         System.out.println("Сервис аутентификации запущен");
     }
 
@@ -36,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void stop() {
+        LOGGER.log(Level.INFO, "Сервис аутентификации остановлен");
         System.out.println("Сервис аутентификации остановлен");
 
     }
